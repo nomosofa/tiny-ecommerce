@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    dynamic:
+      enabled: true
+      primary: master_1
+      strict: true
+      grace-destroy: false
+      datasource:
+        master_1:
+          url: jdbc:mysql://localhost:3306/ecommerce_db1
+          username: root
+          password: jiecheng
+          driver-class-name: com.mysql.jdbc.Driver
+        master_2:
+          url: jdbc:mysql://localhost:3306/ecommerce_db2
+          username: root
+          password: jiecheng
+          driver-class-name: com.mysql.jdbc.Driver
+jwt:
+  secret: yourSecretKey
+  expiration: 604800
