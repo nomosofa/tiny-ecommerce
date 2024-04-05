@@ -23,6 +23,8 @@ import java.util.Optional;
 public class UserController {
 
     private final UserService userService;
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
 
     @Autowired
     public UserController(UserService userService) {
@@ -48,6 +50,16 @@ public class UserController {
     }
 
     // Other endpoints as needed
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse> loginUser(@RequestBody Map<String, String> credentials) {
+        Optional<User> user = userService.authenticateUser(credentials.get("username"), credentials.get("password"));
+        if (user.isPresent()) {
+            String token = jwtTokenUtil.generateToken(user.get().getUsername());
+            return ResponseEntity.ok(new ApiResponse(true, "登录成功", token));
+        } else {
+            return ResponseEntity.badRequest().body(new ApiResponse(false, "用户名或密码错误"));
+        }
+    }
 }
 
 

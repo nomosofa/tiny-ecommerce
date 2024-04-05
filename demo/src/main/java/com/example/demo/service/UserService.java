@@ -57,6 +57,14 @@ public class UserService {
         return new ApiResponse(true, "User found.", user);
     }
 
+    public Optional<User> authenticateUser(String username, String password) {
+        Optional<User> user = userRepository.findById(username);
+        if (user.isPresent() && passwordEncoder.matches(password, user.get().getPassword())) {
+            return user;
+        }
+        return Optional.empty();
+    }
+
 //    @Transactional
 //    public RegistrationResult registerUser(User user) {
 //        // 检查用户名是否已存在
