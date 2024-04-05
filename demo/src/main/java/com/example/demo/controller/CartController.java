@@ -23,33 +23,33 @@ public class CartController {
         this.cartService = cartService;
     }
 
-    @PostMapping("/add")
-    public ResponseEntity<ApiResponse> addItemToCart(@RequestBody CartDTO cartItemDTO) {
-        return ResponseEntity.ok(cartService.addItemToCart(cartItemDTO.getUserId(), cartItemDTO.getProductId(), cartItemDTO.getQuantity()));
-    }
-
-    @PutMapping("/update")
-    public ResponseEntity<ApiResponse> updateCartItem(@RequestBody CartDTO cartItemDTO) {
-        return ResponseEntity.ok(cartService.updateCartItem(cartItemDTO.getUserId(), cartItemDTO.getProductId(), cartItemDTO.getQuantity()));
-    }
-
-    @DeleteMapping("/remove")
-    public ResponseEntity<ApiResponse> removeItemFromCart(@RequestBody CartDTO cartItemDTO) {
-        return ResponseEntity.ok(cartService.removeItemFromCart(cartItemDTO.getUserId(), cartItemDTO.getProductId()));
-    }
-
-    @GetMapping("/{userId}")
-    public ResponseEntity<ApiResponse> getUserCart(@PathVariable Long userId) {
-        return ResponseEntity.ok(cartService.getUserCart(userId));
-    }
-
-    @DeleteMapping("/clear/{userId}")
-    public ResponseEntity<ApiResponse> clearUserCart(@PathVariable Long userId) {
-        ApiResponse response = cartService.clearUserCart(userId);
-        if (response.isSuccess()) {
-            return ResponseEntity.ok(response);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-        }
-    }
+//    @PostMapping("/add")
+//    public ResponseEntity<ApiResponse> addItemToCart(@RequestBody CartDTO cartItemDTO) {
+//        return ResponseEntity.ok(cartService.addItemToCart(cartItemDTO.getUserId(), cartItemDTO.getProductId(), cartItemDTO.getQuantity()));
+//    }
+//
+//    @PutMapping("/update")
+//    public ResponseEntity<ApiResponse> updateCartItem(@RequestBody CartDTO cartItemDTO) {
+//        return ResponseEntity.ok(cartService.updateCartItem(cartItemDTO.getUserId(), cartItemDTO.getProductId(), cartItemDTO.getQuantity()));
+//    }
+//
+//    @DeleteMapping("/remove")
+//    public ResponseEntity<ApiResponse> removeItemFromCart(@RequestBody CartDTO cartItemDTO) {
+//        return ResponseEntity.ok(cartService.removeItemFromCart(cartItemDTO.getUserId(), cartItemDTO.getProductId()));
+//    }
+//
+//    @GetMapping("/{userId}")
+//    public ResponseEntity<ApiResponse> getUserCart(@PathVariable Long userId) {
+//        return ResponseEntity.ok(cartService.getUserCart(userId));
+//    }
+//
+//    @DeleteMapping("/clear/{userId}")
+//    public ResponseEntity<ApiResponse> clearUserCart(@PathVariable Long userId) {
+//        ApiResponse response = cartService.clearUserCart(userId);
+//        if (response.isSuccess()) {
+//            return ResponseEntity.ok(response);
+//        } else {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+//        }
+//    }
 }

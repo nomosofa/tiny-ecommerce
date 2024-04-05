@@ -29,41 +29,41 @@ public class ProductService {
         this.productDbService = productDbService;
     }
 
-    private ProductDTO convertToDTO(Product product) {
-        return new ProductDTO(
-                product.getProductID(),
-                product.getName(),
-                product.getDescription(),
-                product.getPrice(),
-                product.getCategory() != null ? product.getCategory().getName() : null
-        );
-    }
-
-    public Product addProduct(Product product) {
-        // 首先检查具有相同名称的商品是否已存在
-        String dbKey = product.getName().hashCode() % 2 == 0 ? "master_1" : "master_2";
-        Optional<Product> existingProduct = productDbService.findProductByName(product.getName(), dbKey);
-        if (existingProduct.isPresent()) {
-            throw new IllegalStateException("Product with name " + product.getName() + " already exists.");
-        }
-
-        return productDbService.saveProduct(product, dbKey);
-    }
-
-    public Product updateProduct(Product product) {
-        String dbKey = product.getName().hashCode() % 2 == 0 ? "master_1" : "master_2";
-        return productDbService.saveProduct(product, dbKey);
-    }
-
-    public Optional<Product> findProductByName(String name) {
-        String dbKey = name.hashCode() % 2 == 0 ? "master_1" : "master_2";
-        return productDbService.findProductByName(name, dbKey);
-    }
-
-    public void deleteProductByName(String name) {
-        String dbKey = name.hashCode() % 2 == 0 ? "master_1" : "master_2";
-        productDbService.deleteProductByName(name, dbKey);
-    }
+//    private ProductDTO convertToDTO(Product product) {
+//        return new ProductDTO(
+//                product.getProductID(),
+//                product.getName(),
+//                product.getDescription(),
+//                product.getPrice(),
+//                product.getCategory() != null ? product.getCategory().getName() : null
+//        );
+//    }
+//
+//    public Product addProduct(Product product) {
+//        // 首先检查具有相同名称的商品是否已存在
+//        String dbKey = product.getName().hashCode() % 2 == 0 ? "master_1" : "master_2";
+//        Optional<Product> existingProduct = productDbService.findProductByName(product.getName(), dbKey);
+//        if (existingProduct.isPresent()) {
+//            throw new IllegalStateException("Product with name " + product.getName() + " already exists.");
+//        }
+//
+//        return productDbService.saveProduct(product, dbKey);
+//    }
+//
+//    public Product updateProduct(Product product) {
+//        String dbKey = product.getName().hashCode() % 2 == 0 ? "master_1" : "master_2";
+//        return productDbService.saveProduct(product, dbKey);
+//    }
+//
+//    public Optional<Product> findProductByName(String name) {
+//        String dbKey = name.hashCode() % 2 == 0 ? "master_1" : "master_2";
+//        return productDbService.findProductByName(name, dbKey);
+//    }
+//
+//    public void deleteProductByName(String name) {
+//        String dbKey = name.hashCode() % 2 == 0 ? "master_1" : "master_2";
+//        productDbService.deleteProductByName(name, dbKey);
+//    }
 
 
 

@@ -12,34 +12,11 @@ import java.math.BigDecimal;
 @Table(name = "Products")
 public class Product {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long productID;
-
-    @Column(unique = true)
     private String name;
 
-    @Column(nullable = false)
-    private String description;
-
-    @Column(nullable = false)
     private BigDecimal price;
-
-    @ManyToOne
-    @JoinColumn(name = "categoryID", referencedColumnName = "categoryID")
-    private Category category;
-
-    public Product(Long productId) {
-    }
-
-    // getters 和 setters
-
-    public Long getProductID() {
-        return productID;
-    }
-
-    public void setProductID(Long productID) {
-        this.productID = productID;
-    }
+    private String category;
+    private String brand;
 
     public String getName() {
         return name;
@@ -47,14 +24,6 @@ public class Product {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public BigDecimal getPrice() {
@@ -65,11 +34,19 @@ public class Product {
         this.price = price;
     }
 
-    public Category getCategory() {
+    public String getCategory() {
         return category;
     }
 
-    public void setCategory(Category category) {
+    public void setCategory(String category) {
         this.category = category;
+    }
+
+    public String getBrand() {
+        return brand;
+    }
+
+    public void setBrand(String brand) {
+        this.brand = brand;
     }
 }

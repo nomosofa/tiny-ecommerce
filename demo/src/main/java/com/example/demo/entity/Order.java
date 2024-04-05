@@ -1,6 +1,8 @@
 package com.example.demo.entity;
 
 import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -15,17 +17,10 @@ public class Order {
     private Long orderID;
 
     @ManyToOne
-    @JoinColumn(name = "userID", referencedColumnName = "userID")
+    @JoinColumn(name = "username")
     private User user;
 
-    @Column(nullable = false)
-    private Date datePlaced;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private OrderStatus status; // 假设你有一个名为OrderStatus的枚举定义
-
-    // getters 和 setters
+    private LocalDateTime date;
 
     public Long getOrderID() {
         return orderID;
@@ -43,19 +38,11 @@ public class Order {
         this.user = user;
     }
 
-    public Date getDatePlaced() {
-        return datePlaced;
+    public LocalDateTime getDate() {
+        return date;
     }
 
-    public void setDatePlaced(Date datePlaced) {
-        this.datePlaced = datePlaced;
-    }
-
-    public OrderStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(OrderStatus status) {
-        this.status = status;
+    public void setDate(LocalDateTime date) {
+        this.date = date;
     }
 }

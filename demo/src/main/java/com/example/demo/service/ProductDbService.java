@@ -23,23 +23,23 @@ public class ProductDbService {
         this.productRepository = productRepository;
     }
 
-    @DS("#dbIdentifier")
-    public Product saveProduct(Product product, String dbIdentifier) {
-        return productRepository.save(product);
-    }
-
-    @DS("#dbIdentifier")
-    public Optional<Product> findProductByName(String name, String dbIdentifier) {
-        return productRepository.findByName(name);
-    }
-
-    @DS("#dbIdentifier")
-    public void deleteProductByName(String name, String dbIdentifier) {
-        productRepository.deleteByName(name);
-    }
-
-    @DS("#dbIdentifier")
-    public List<Product> findAllProducts(String dbIdentifier) {
-        return productRepository.findAll();
-    }
+//    @DS("#dbIdentifier")
+//    public Product saveProduct(Product product, String dbIdentifier) {
+//        return productRepository.save(product);
+//    }
+//
+//    @DS("#dbIdentifier")
+//    public Optional<Product> findProductByName(String name, String dbIdentifier) {
+//        return productRepository.findByName(name);
+//    }
+//
+//    @DS("#dbIdentifier")
+//    public void deleteProductByName(String name, String dbIdentifier) {
+//        productRepository.deleteByName(name);
+//    }
+//
+//    @DS("#dbIdentifier")
+//    public List<Product> findAllProducts(String dbIdentifier) {
+//        return productRepository.findAll();
+//    }
 }
