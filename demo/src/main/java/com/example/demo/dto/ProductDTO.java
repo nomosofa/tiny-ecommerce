@@ -7,29 +7,16 @@ import java.math.BigDecimal;
  * @version 1.0
  */
 public class ProductDTO {
-    private Long id;
     private String name;
-    private String description;
     private BigDecimal price;
-    private String categoryName;
+    private String category;
+    private String brand;
 
-    public ProductDTO() {
-    }
-
-    public ProductDTO(Long id, String name, String description, BigDecimal price, String categoryName) {
-        this.id = id;
+    public ProductDTO(String name, BigDecimal price, String category, String brand) {
         this.name = name;
-        this.description = description;
         this.price = price;
-        this.categoryName = categoryName;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
+        this.category = category;
+        this.brand = brand;
     }
 
     public String getName() {
@@ -40,14 +27,6 @@ public class ProductDTO {
         this.name = name;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public BigDecimal getPrice() {
         return price;
     }
@@ -56,11 +35,19 @@ public class ProductDTO {
         this.price = price;
     }
 
-    public String getCategoryName() {
-        return categoryName;
+    public String getCategory() {
+        return category;
     }
 
-    public void setCategoryName(String categoryName) {
-        this.categoryName = categoryName;
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public String getBrand() {
+        return brand;
+    }
+
+    public void setBrand(String brand) {
+        this.brand = brand;
     }
 }

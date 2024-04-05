@@ -1,18 +1,21 @@
 package com.example.demo.controller;
 
-import com.baomidou.dynamic.datasource.annotation.DS;
 import com.example.demo.dto.ApiResponse;
+import com.example.demo.dto.ProductDTO;
 import com.example.demo.entity.Product;
-import com.example.demo.repository.ProductRepository;
 import com.example.demo.service.ProductService;
-import com.example.demo.service.ProductService1;
-import com.example.demo.service.ProductService2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
+//import java.awt.print.Pageable;
+import org.springframework.data.domain.Page;
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author 揭程
@@ -22,27 +25,73 @@ import java.util.List;
 @RequestMapping("/api/products")
 public class ProductController {
 
-    private final ProductService1 productService1;
-    private final ProductService2 productService2;
-
     @Autowired
-    public ProductController(ProductService1 productService1, ProductService2 productService2) {
-        this.productService1 = productService1;
-        this.productService2 = productService2;
+    private ProductService productService;
+
+//    @GetMapping
+//    public ResponseEntity<List<Product>> getAllProducts() {
+//        List<Product> products = productService.findAllProducts();
+//        return ResponseEntity.ok(products);
+//    }
+
+    @GetMapping
+    public ResponseEntity<Page<ProductDTO>> getAllProducts(Pageable pageable) {
+        Page<ProductDTO> products = productService.findAllProducts(pageable);
+        return ResponseEntity.ok(products);
     }
 
-//    @PostMapping("/add")
-//    public ResponseEntity<ApiResponse> addProduct(@RequestBody Product product) {
-//        System.out.println("addProduct=========================" + (product.getName().hashCode() % 2 == 0 ? "master_1" : "master_2") + "=========================");
-//
-//        Product savedProduct;
-//        if (product.getName().hashCode() % 2 == 0) {
-//            savedProduct = productService1.addProduct(product);
-//        } else {
-//            savedProduct = productService2.addProduct(product);
-//        }
-//        return ResponseEntity.ok(new ApiResponse(true, "Product processed successfully", savedProduct));
-//    }
+
+    @GetMapping("/{name}")
+    public ResponseEntity<Product> getProductByName(@PathVariable String name) {
+        Optional<Product> product = productService.findProductByName(name);
+        if (product == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(product.get());
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<ProductDTO>> searchProducts(
+            @RequestParam(required = false) String nameLike,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String brand,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice) {
+
+        List<Product> products = productService.searchProducts(nameLike, category, brand, minPrice, maxPrice);
+        List<ProductDTO> productDTOs = products.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(productDTOs);
+    }
+
+    private ProductDTO convertToDTO(Product product) {
+        // 实现转换逻辑
+        return new ProductDTO(product.getName(), product.getPrice(), product.getCategory(), product.getBrand());
+    }
+
+    @PostMapping("/add")
+    public ResponseEntity<ApiResponse> addProduct(@RequestBody Product product) {
+        System.out.println("addProduct=========================" + (product.getName().hashCode() % 2 == 0 ? "master_1" : "master_2") + "=========================");
+
+        Product savedProduct = productService.addProduct(product);
+
+        return ResponseEntity.ok(new ApiResponse(true, "Product processed successfully", savedProduct));
+    }
+
+    @DeleteMapping("/{name}")
+    public ResponseEntity<ApiResponse> deleteProduct(@PathVariable String name) {
+        ApiResponse response = productService.deleteProduct(name);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<ApiResponse> updateProduct(@RequestBody ProductDTO productDTO) {
+        ApiResponse response = productService.updateProduct(productDTO);
+        return ResponseEntity.ok(response);
+    }
+
 //
 //    @PostMapping("/update")
 //    public ResponseEntity<ApiResponse> updateProduct(@RequestBody Product product) {
