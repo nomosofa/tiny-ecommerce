@@ -28,6 +28,9 @@ public class Product {
     @JoinColumn(name = "categoryID", referencedColumnName = "categoryID")
     private Category category;
 
+    public Product(Long productId) {
+    }
+
     // getters 和 setters
 
     public Long getProductID() {

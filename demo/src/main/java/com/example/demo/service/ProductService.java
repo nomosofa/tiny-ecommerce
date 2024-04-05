@@ -66,13 +66,6 @@ public class ProductService {
     }
 
 
-    public List<Product> findAllProductsFromDb1() {
-        return productDbService.findAllProducts("master_1");
-    }
-
-    public List<Product> findAllProductsFromDb2() {
-        return productDbService.findAllProducts("master_2");
-    }
 
 
 

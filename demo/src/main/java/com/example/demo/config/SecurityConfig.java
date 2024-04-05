@@ -35,7 +35,8 @@ public class SecurityConfig {
                 .and()
                 .authorizeRequests()
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/**").permitAll()
+//                .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
                 .requestMatchers("/api/users/login", "/api/users/register").permitAll() // Allows access to any user.
 //                .requestMatchers("/api/admin/**").hasRole("ADMIN") // 如果角色是"ROLE_ADMIN"
 //                .requestMatchers("/api/user/**").hasRole("USER") // 如果角色是"ROLE_USER"

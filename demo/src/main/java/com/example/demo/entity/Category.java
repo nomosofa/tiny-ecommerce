@@ -13,7 +13,7 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long categoryID;
 
-    @Column(nullable = false)
+    @Column(unique = true)
     private String name;
 
     // getters 和 setters

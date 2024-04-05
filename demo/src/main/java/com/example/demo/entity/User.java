@@ -25,6 +25,19 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role; // 假设你有一个Role枚举
 
+    public User() {
+    }
+
+    public User(Long userId) {
+    }
+
+    public User(Long userID, String username, String password, String email, Role role) {
+        this.userID = userID;
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.role = role;
+    }
     // getters 和 setters
 
     public Long getUserID() {
