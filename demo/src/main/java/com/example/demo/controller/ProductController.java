@@ -56,10 +56,18 @@ public class ProductController {
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String brand,
             @RequestParam(required = false) BigDecimal minPrice,
-            @RequestParam(required = false) BigDecimal maxPrice) {
+            @RequestParam(required = false) BigDecimal maxPrice,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
 
         List<Product> products = productService.searchProducts(nameLike, category, brand, minPrice, maxPrice);
-        List<ProductDTO> productDTOs = products.stream()
+
+        // 手动实现分页逻辑
+        int fromIndex = Math.min(page * size, products.size());
+        int toIndex = Math.min((page + 1) * size, products.size());
+        List<Product> pagedProducts = products.subList(fromIndex, toIndex);
+
+        List<ProductDTO> productDTOs = pagedProducts.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
 
