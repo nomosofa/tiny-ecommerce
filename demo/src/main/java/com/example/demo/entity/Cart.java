@@ -14,17 +14,14 @@ public class Cart {
     private Long cartID;
 
     @ManyToOne
-    @JoinColumn(name = "userID", referencedColumnName = "userID")
+    @JoinColumn(name = "username")
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "productID", referencedColumnName = "productID")
+    @JoinColumn(name = "productname")
     private Product product;
 
-    @Column(nullable = false)
     private Integer quantity;
-
-    // getters 和 setters
 
     public Long getCartID() {
         return cartID;

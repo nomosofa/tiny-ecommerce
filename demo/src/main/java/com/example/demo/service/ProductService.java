@@ -1,15 +1,17 @@
 package com.example.demo.service;
 
 import com.baomidou.dynamic.datasource.annotation.DS;
+import com.example.demo.dto.ApiResponse;
 import com.example.demo.dto.ProductDTO;
 import com.example.demo.entity.Product;
 import com.example.demo.repository.ProductRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -22,37 +24,63 @@ import java.util.stream.Collectors;
 @Service
 public class ProductService {
 
+    private final ProductRepository productRepository;
     private final ProductDbService productDbService;
 
     @Autowired
-    public ProductService(ProductDbService productDbService) {
+    public ProductService(ProductRepository productRepository, ProductDbService productDbService) {
+        this.productRepository = productRepository;
         this.productDbService = productDbService;
     }
 
-    private ProductDTO convertToDTO(Product product) {
-        return new ProductDTO(
-                product.getProductID(),
-                product.getName(),
-                product.getDescription(),
-                product.getPrice(),
-                product.getCategory() != null ? product.getCategory().getName() : null
-        );
+
+    // 查询所有商品，这里可能需要合并两个数据库的查询结果
+//    public List<Product> findAllProducts() {
+//        List<Product> allProducts = new ArrayList<>(productDbService.findAllProducts("master_1"));
+//        allProducts.addAll(productDbService.findAllProducts("master_2"));
+//        return allProducts;
+//    }
+    public List<Product> findAllProducts() {
+        // 分别从两个数据源获取商品列表
+        List<Product> productsFromDb1 = productDbService.findAllProductsWithoutPage("master_1");
+        List<Product> productsFromDb2 = productDbService.findAllProductsWithoutPage("master_2");
+
+        // 合并两个列表
+        List<Product> combinedProducts = new ArrayList<>();
+        combinedProducts.addAll(productsFromDb1);
+        combinedProducts.addAll(productsFromDb2);
+
+        // 转换为DTO列表
+        return combinedProducts;
     }
 
+    public Page<ProductDTO> findAllProducts(Pageable pageable) {
+        // 分别从两个数据源获取分页的商品列表
+        Page<Product> productsFromDb1 = productDbService.findAllProducts("master_1", pageable);
+        Page<Product> productsFromDb2 = productDbService.findAllProducts("master_2", pageable);
+
+        // 合并两个列表
+        List<Product> combinedProducts = new ArrayList<>();
+        combinedProducts.addAll(productsFromDb1.getContent());
+        combinedProducts.addAll(productsFromDb2.getContent());
+
+        // 这里的总页数和总元素数量为简化计算结果，实际应根据需求调整
+        return new PageImpl<>(combinedProducts.stream().map(this::convertToDTO).collect(Collectors.toList()), pageable, productsFromDb1.getTotalElements() + productsFromDb2.getTotalElements());
+    }
+
+
+    //    @Transactional
     public Product addProduct(Product product) {
-        // 首先检查具有相同名称的商品是否已存在
-        String dbKey = product.getName().hashCode() % 2 == 0 ? "master_1" : "master_2";
-        Optional<Product> existingProduct = productDbService.findProductByName(product.getName(), dbKey);
+        String dbIdentifier = product.getName().hashCode() % 2 == 0 ? "master_1" : "master_2";
+        Optional<Product> existingProduct = productDbService.findProductByName(product.getName(), dbIdentifier);
+
         if (existingProduct.isPresent()) {
-            throw new IllegalStateException("Product with name " + product.getName() + " already exists.");
+//            return new ApiResponse(false, "Product with name " + product.getName() + " already exists.");
+            return null;
         }
 
-        return productDbService.saveProduct(product, dbKey);
-    }
-
-    public Product updateProduct(Product product) {
-        String dbKey = product.getName().hashCode() % 2 == 0 ? "master_1" : "master_2";
-        return productDbService.saveProduct(product, dbKey);
+        Product savedProduct = productDbService.saveProduct(product, dbIdentifier);
+        return savedProduct;
     }
 
     public Optional<Product> findProductByName(String name) {
@@ -60,89 +88,45 @@ public class ProductService {
         return productDbService.findProductByName(name, dbKey);
     }
 
-    public void deleteProductByName(String name) {
-        String dbKey = name.hashCode() % 2 == 0 ? "master_1" : "master_2";
-        productDbService.deleteProductByName(name, dbKey);
+    public List<Product> searchProducts(String nameLike, String category, String brand, BigDecimal minPrice, BigDecimal maxPrice) {
+        // 此处假设我们需要动态决定数据源，但实际上，搜索可能需要在两个数据源中都执行，然后合并结果
+        String dbIdentifier1 = "master_1";
+        List<Product> productsFromDb1 = productDbService.searchProductsInDb(nameLike, category, brand, minPrice, maxPrice, dbIdentifier1);
+
+        String dbIdentifier2 = "master_2";
+        List<Product> productsFromDb2 = productDbService.searchProductsInDb(nameLike, category, brand, minPrice, maxPrice, dbIdentifier2);
+
+        // 合并两个数据源的结果
+        List<Product> combinedResults = new ArrayList<>(productsFromDb1);
+        combinedResults.addAll(productsFromDb2);
+        return combinedResults;
     }
 
-
-    public List<Product> findAllProductsFromDb1() {
-        return productDbService.findAllProducts("master_1");
+    private ProductDTO convertToDTO(Product product) {
+        // 实现转换逻辑
+        return new ProductDTO(product.getName(), product.getPrice(), product.getCategory(), product.getBrand());
     }
 
-    public List<Product> findAllProductsFromDb2() {
-        return productDbService.findAllProducts("master_2");
+    public ApiResponse deleteProduct(String name) {
+        String dbIdentifier = name.hashCode() % 2 == 0 ? "master_1" : "master_2";
+        boolean deleted = productDbService.deleteProductByName(name, dbIdentifier);
+
+        if (deleted) {
+            return new ApiResponse(true, "Product deleted successfully.");
+        } else {
+            return new ApiResponse(false, "Product not found.");
+        }
     }
 
+    public ApiResponse updateProduct(ProductDTO productDTO) {
+        String dbIdentifier = productDTO.getName().hashCode() % 2 == 0 ? "master_1" : "master_2";
+        boolean updated = productDbService.updateProduct(productDTO, dbIdentifier);
 
+        if (updated) {
+            return new ApiResponse(true, "Product updated successfully.");
+        } else {
+            return new ApiResponse(false, "Product not found.");
+        }
+    }
 
-
-
-
-
-
-
-
-////    @Transactional
-//    public Product addProduct(Product product) {
-//        // 首先检查具有相同名称的商品是否已存在
-//        Optional<Product> existingProduct = productRepository.findByName(product.getName());
-//        if (existingProduct.isPresent()) {
-//            // 如果存在，抛出异常或返回已存在的实体
-//            throw new IllegalStateException("Product with name " + product.getName() + " already exists.");
-//        }
-//
-//        // 基于名称的hash值决定使用哪个数据库
-//        String dbKey = product.getName().hashCode() % 2 == 0 ? "master_1" : "master_2";
-//        System.out.println("=========================" + dbKey + "=========================");
-//        return addProductToDb(product);
-//    }
-//
-////    @DS("#product.name.hashCode() % 2 == 0 ? 'master_1' : 'master_2'")
-//    @DS("master_2")
-//    private Product addProductToDb(Product product) {
-//        // 此处省略了具体的数据库操作逻辑，只需调用对应的repository保存方法
-//        return productRepository.save(product);
-//    }
-//
-//    @DS("#product.name.hashCode() % 2 == 0 ? 'master_1' : 'master_2'")
-////    @Transactional
-//    public Product update(Product product) {
-//        // 通过商品名称查找现有商品
-//        Product existingProduct = productRepository.findByName(product.getName())
-//                .orElseThrow(() -> new EntityNotFoundException("Product with name " + product.getName() + " not found."));
-//
-//        // 更新商品的详细信息
-//        existingProduct.setDescription(product.getDescription());
-//        existingProduct.setPrice(product.getPrice());
-//        // 根据需要更新其他字段，但排除了name和category因为这些可能是不变的或者唯一的
-//        // 如果category也需要更新，你需要先验证新的category是否存在
-//
-//        return productRepository.save(existingProduct);
-//    }
-//
-//    @DS("#name.hashCode() % 2 == 0 ? 'master_1' : 'master_2'")
-////    @Transactional
-//    public Optional<Product> findProductByName(String name) {
-//        return productRepository.findByName(name);
-//    }
-//
-//    @DS("#name.hashCode() % 2 == 0 ? 'master_1' : 'master_2'")
-////    @Transactional
-//    public void deleteProductByName(String name) {
-//        productRepository.deleteByName(name);
-//    }
-//
-//    // 查询所有商品，这里可能需要合并两个数据库的查询结果
-//    public List<Product> findAllProducts() {
-//        List<Product> allProducts = new ArrayList<>();
-//        allProducts.addAll(findAllProductsFromDb("master_1"));
-//        allProducts.addAll(findAllProductsFromDb("master_2"));
-//        return allProducts;
-//    }
-//
-//    @DS("#dbIdentifier")
-//    protected List<Product> findAllProductsFromDb(String dbIdentifier) {
-//        return productRepository.findAll();
-//    }
 }
