@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.ApiResponse;
+import com.example.demo.dto.PaginatedResponse;
 import com.example.demo.dto.ProductDTO;
 import com.example.demo.entity.Product;
 import com.example.demo.service.ProductService;
@@ -77,7 +78,7 @@ public class ProductController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<ProductDTO>> searchProducts(
+    public ResponseEntity<PaginatedResponse<ProductDTO>> searchProducts(
             @RequestParam(required = false) String nameLike,
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String brand,
@@ -101,12 +102,15 @@ public class ProductController {
                 .sorted(comparator)
                 .collect(Collectors.toList());
 
+        // 总数量
+        long totalElements = sortedProductDTOs.size();
+
         // 手动实现分页逻辑
         int fromIndex = Math.min(page * size, sortedProductDTOs.size());
         int toIndex = Math.min((page + 1) * size, sortedProductDTOs.size());
         List<ProductDTO> pagedProducts = sortedProductDTOs.subList(fromIndex, toIndex);
 
-        return ResponseEntity.ok(pagedProducts);
+        return ResponseEntity.ok(new PaginatedResponse<>(pagedProducts, totalElements));
     }
 
     private ProductDTO convertToDTO(Product product) {
