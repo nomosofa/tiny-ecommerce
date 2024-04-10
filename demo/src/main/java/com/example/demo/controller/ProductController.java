@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 //import java.awt.print.Pageable;
 import org.springframework.data.domain.Page;
 import java.math.BigDecimal;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -40,6 +41,31 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
+    @GetMapping("/sorted")
+    public ResponseEntity<List<ProductDTO>> getAllProductsSorted(
+            @RequestParam(defaultValue = "desc") String sortOrder,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        List<Product> products = productService.findAllProducts();
+        List<ProductDTO> productDTOs = products.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+
+        // Sort by price in ascending or descending order
+        if ("asc".equalsIgnoreCase(sortOrder)) {
+            productDTOs.sort(Comparator.comparing(ProductDTO::getPrice));
+        } else { // Default to descending order
+            productDTOs.sort(Comparator.comparing(ProductDTO::getPrice).reversed());
+        }
+
+        // Implement "fake" pagination
+        int start = Math.min(page * size, productDTOs.size());
+        int end = Math.min((page + 1) * size, productDTOs.size());
+        List<ProductDTO> paginatedProducts = productDTOs.subList(start, end);
+
+        return ResponseEntity.ok(paginatedProducts);
+    }
+
 
     @GetMapping("/{name}")
     public ResponseEntity<Product> getProductByName(@PathVariable String name) {
@@ -57,21 +83,30 @@ public class ProductController {
             @RequestParam(required = false) String brand,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
+            @RequestParam(defaultValue = "asc") String sort,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
         List<Product> products = productService.searchProducts(nameLike, category, brand, minPrice, maxPrice);
 
-        // 手动实现分页逻辑
-        int fromIndex = Math.min(page * size, products.size());
-        int toIndex = Math.min((page + 1) * size, products.size());
-        List<Product> pagedProducts = products.subList(fromIndex, toIndex);
+        // 排序
+        Comparator<ProductDTO> comparator = Comparator.comparing(ProductDTO::getPrice);
+        if ("desc".equalsIgnoreCase(sort)) {
+            comparator = comparator.reversed();
+        }
 
-        List<ProductDTO> productDTOs = pagedProducts.stream()
+        // 转换为DTO并排序
+        List<ProductDTO> sortedProductDTOs = products.stream()
                 .map(this::convertToDTO)
+                .sorted(comparator)
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok(productDTOs);
+        // 手动实现分页逻辑
+        int fromIndex = Math.min(page * size, sortedProductDTOs.size());
+        int toIndex = Math.min((page + 1) * size, sortedProductDTOs.size());
+        List<ProductDTO> pagedProducts = sortedProductDTOs.subList(fromIndex, toIndex);
+
+        return ResponseEntity.ok(pagedProducts);
     }
 
     private ProductDTO convertToDTO(Product product) {

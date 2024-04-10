@@ -40,6 +40,20 @@ public class ProductService {
 //        allProducts.addAll(productDbService.findAllProducts("master_2"));
 //        return allProducts;
 //    }
+    public List<Product> findAllProducts() {
+        // 分别从两个数据源获取商品列表
+        List<Product> productsFromDb1 = productDbService.findAllProductsWithoutPage("master_1");
+        List<Product> productsFromDb2 = productDbService.findAllProductsWithoutPage("master_2");
+
+        // 合并两个列表
+        List<Product> combinedProducts = new ArrayList<>();
+        combinedProducts.addAll(productsFromDb1);
+        combinedProducts.addAll(productsFromDb2);
+
+        // 转换为DTO列表
+        return combinedProducts;
+    }
+
     public Page<ProductDTO> findAllProducts(Pageable pageable) {
         // 分别从两个数据源获取分页的商品列表
         Page<Product> productsFromDb1 = productDbService.findAllProducts("master_1", pageable);

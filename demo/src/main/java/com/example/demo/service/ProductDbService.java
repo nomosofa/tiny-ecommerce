@@ -49,10 +49,11 @@ public class ProductDbService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-//    @DS("#dbIdentifier")
-//    public List findAllProducts(String dbIdentifier) {
-//        return jdbcTemplate.queryForList("select * from products");
-//    }
+    @DS("#dbIdentifier")
+    public List<Product> findAllProductsWithoutPage(String dbIdentifier) {
+        String sql = "SELECT * FROM products";
+        return jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Product.class));
+    }
 
     @DS("#dbIdentifier")
     public Page<Product> findAllProducts(String dbIdentifier, Pageable pageable) {
