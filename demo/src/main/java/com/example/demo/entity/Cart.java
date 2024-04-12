@@ -17,9 +17,10 @@ public class Cart {
     @JoinColumn(name = "username")
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "productname")
-    private Product product;
+//    @ManyToOne
+//    @JoinColumn(name = "productname")
+//    private Product product;
+    private String productname;
 
     private Integer quantity;
 
@@ -39,12 +40,12 @@ public class Cart {
         this.user = user;
     }
 
-    public Product getProduct() {
-        return product;
+    public String getProductname() {
+        return productname;
     }
 
-    public void setProduct(Product product) {
-        this.product = product;
+    public void setProductname(String productname) {
+        this.productname = productname;
     }
 
     public Integer getQuantity() {

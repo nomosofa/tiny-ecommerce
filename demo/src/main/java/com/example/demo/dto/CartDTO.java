@@ -5,33 +5,36 @@ package com.example.demo.dto;
  * @version 1.0
  */
 public class CartDTO {
-    private Long userId;
-    private Long productId;
+    private String username;
+    private String productname;
     private Integer quantity;
+
+    // Constructors, Getters, Setters
+
 
     public CartDTO() {
     }
 
-    public CartDTO(Long userId, Long productId, Integer quantity) {
-        this.userId = userId;
-        this.productId = productId;
+    public CartDTO(String username, String productname, Integer quantity) {
+        this.username = username;
+        this.productname = productname;
         this.quantity = quantity;
     }
 
-    public Long getUserId() {
-        return userId;
+    public String getUsername() {
+        return username;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
-    public Long getProductId() {
-        return productId;
+    public String getProductname() {
+        return productname;
     }
 
-    public void setProductId(Long productId) {
-        this.productId = productId;
+    public void setProductname(String productname) {
+        this.productname = productname;
     }
 
     public Integer getQuantity() {
@@ -42,3 +45,4 @@ public class CartDTO {
         this.quantity = quantity;
     }
 }
+
