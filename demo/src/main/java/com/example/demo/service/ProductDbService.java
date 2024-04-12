@@ -36,11 +36,6 @@ public class ProductDbService {
         return productRepository.save(product);
     }
 
-    @DS("#dbIdentifier")
-    public Optional<Product> findProductByName(String name, String dbIdentifier) {
-        return productRepository.findById(name);
-    }
-
 //    @DS("#dbIdentifier")
 //    public void deleteProductByName(String name, String dbIdentifier) {
 //        productRepository.deleteById(name);
@@ -48,6 +43,13 @@ public class ProductDbService {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @DS("#dbIdentifier")
+    public Optional<Product> findProductByName(String name, String dbIdentifier) {
+        String sql = "SELECT * FROM products WHERE name = ?";
+        List<Product> products = jdbcTemplate.query(sql, new Object[]{name}, new BeanPropertyRowMapper<>(Product.class));
+        return products.stream().findFirst();
+    }
 
     @DS("#dbIdentifier")
     public List<Product> findAllProductsWithoutPage(String dbIdentifier) {
