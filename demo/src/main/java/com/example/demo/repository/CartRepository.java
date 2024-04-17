@@ -31,4 +31,7 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
     void deleteAllByUser(User user);
     @Query("SELECT c FROM Cart c WHERE c.user = :user")
     Page<Cart> findAllByUserWithPagination(User user, Pageable pageable);
+    // Delete all cart items with the specified product name
+    void deleteAllByProductname(String productname);
+
 }

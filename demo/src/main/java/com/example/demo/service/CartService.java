@@ -88,6 +88,10 @@ public class CartService {
         for (Cart cart : cartItems) {
             String productName = cart.getProductname();
             Optional<Product> productOptional = productService.findProductByName(productName);
+            if (productOptional.isEmpty()) {
+                cartRepository.delete(cart);
+                continue;
+            }
             ProductDTO productDTO = productOptional.map(p ->
                             new ProductDTO(p.getName(), p.getPrice(), p.getCategory(), p.getBrand()))
                     .orElse(null);

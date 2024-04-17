@@ -4,6 +4,7 @@ import com.baomidou.dynamic.datasource.annotation.DS;
 import com.example.demo.dto.ApiResponse;
 import com.example.demo.dto.ProductDTO;
 import com.example.demo.entity.Product;
+import com.example.demo.repository.CartRepository;
 import com.example.demo.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -26,11 +27,13 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final ProductDbService productDbService;
+    private final CartRepository cartRepository;
 
     @Autowired
-    public ProductService(ProductRepository productRepository, ProductDbService productDbService) {
+    public ProductService(ProductRepository productRepository, ProductDbService productDbService, CartRepository cartRepository) {
         this.productRepository = productRepository;
         this.productDbService = productDbService;
+        this.cartRepository = cartRepository;
     }
 
 
@@ -110,6 +113,9 @@ public class ProductService {
     public ApiResponse deleteProduct(String name) {
         String dbIdentifier = name.hashCode() % 2 == 0 ? "master_1" : "master_2";
         boolean deleted = productDbService.deleteProductByName(name, dbIdentifier);
+
+        // Delete all cart items with the specified product name
+        cartRepository.deleteAllByProductname(name);
 
         if (deleted) {
             return new ApiResponse(true, "Product deleted successfully.");
