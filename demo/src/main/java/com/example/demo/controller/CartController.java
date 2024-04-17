@@ -44,6 +44,15 @@ public class CartController {
         return ResponseEntity.ok(new ApiResponse(true, "Cart retrieved successfully.", response.getData()));
     }
 
+    @GetMapping("/count/{username}")
+    public ResponseEntity<ApiResponse> getUserCartCount(@PathVariable String username) {
+        ApiResponse response = cartService.getUserCartCount(username);
+        if (response.getData() == null) {
+            return ResponseEntity.ok(new ApiResponse(false, "Cart is empty.", 0));
+        }
+        return ResponseEntity.ok(new ApiResponse(true, "Cart count retrieved successfully.", response.getData()));
+    }
+
     @DeleteMapping("/{username}/{productname}")
     public ResponseEntity<ApiResponse> removeItemFromCart(@PathVariable String username, @PathVariable String productname) {
         ApiResponse response = cartService.removeItemFromCart(username, productname);

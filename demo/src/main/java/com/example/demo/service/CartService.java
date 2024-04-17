@@ -99,6 +99,15 @@ public class CartService {
         return new ApiResponse(true, "Get items", cartDTOList) ;
     }
 
+    public ApiResponse getUserCartCount(String username) {
+        Optional<User> user = userRepository.findById(username);
+        if (user.isEmpty()) {
+            return new ApiResponse(false, "User not found.");
+        }
+        List<Cart> cartItems = cartRepository.findAllByUser(user.get());
+        return new ApiResponse(true, "Get items count: ", cartItems.size()) ;
+    }
+
     public ApiResponse removeItemFromCart(String username, String productname) {
         // Check if user exists
         Optional<User> user = userRepository.findById(username);
