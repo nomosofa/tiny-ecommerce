@@ -55,7 +55,7 @@ public class CartService {
         if (existingItem.isPresent()) {
             Cart item = existingItem.get();
             // Update quantity if item already exists
-            item.setQuantity(item.getQuantity() + cartDTO.getQuantity());
+            item.setQuantity(cartDTO.getQuantity());
             cartRepository.save(item);
             return new ApiResponse(true, "Quantity updated in cart.");
         } else {
