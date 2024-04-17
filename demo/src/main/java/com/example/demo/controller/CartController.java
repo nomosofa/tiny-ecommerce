@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.ApiResponse;
 import com.example.demo.dto.CartDTO;
+import com.example.demo.dto.ProductDTO;
 import com.example.demo.service.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,8 +34,10 @@ public class CartController {
 
     // Other endpoints...
     @GetMapping("/{username}")
-    public ResponseEntity<ApiResponse> getUserCart(@PathVariable String username) {
-        ApiResponse response = cartService.getUserCart(username);
+    public ResponseEntity<ApiResponse> getUserCart(@PathVariable String username,
+                                                   @RequestParam(defaultValue = "0") int page,
+                                                   @RequestParam(defaultValue = "10") int size) {
+        ApiResponse response = cartService.getUserCart(username, page, size);
         if (response.getData() == null) {
             return ResponseEntity.ok(new ApiResponse(false, "Cart is empty."));
         }

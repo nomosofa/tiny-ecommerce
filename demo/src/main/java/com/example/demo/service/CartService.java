@@ -10,6 +10,9 @@ import com.example.demo.repository.CartRepository;
 import com.example.demo.repository.ProductRepository;
 import com.example.demo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -72,12 +75,14 @@ public class CartService {
     }
 
     // Other methods...
-    public ApiResponse getUserCart(String username) {
+    public ApiResponse getUserCart(String username, int page, int size) {
         Optional<User> user = userRepository.findById(username);
         if (user.isEmpty()) {
             return new ApiResponse(false, "User not found.");
         }
-        List<Cart> cartItems = cartRepository.findAllByUser(user.get());
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Cart> cartItemsPage = cartRepository.findAllByUserWithPagination(user.get(), pageable);
+        List<Cart> cartItems = cartItemsPage.getContent();
 
         List<CartDTO> cartDTOList = new ArrayList<>();
         for (Cart cart : cartItems) {
