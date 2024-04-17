@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.dto.ApiResponse;
 import com.example.demo.dto.CartDTO;
+import com.example.demo.dto.ProductDTO;
 import com.example.demo.entity.Cart;
 import com.example.demo.entity.Product;
 import com.example.demo.entity.User;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -76,9 +78,20 @@ public class CartService {
             return new ApiResponse(false, "User not found.");
         }
         List<Cart> cartItems = cartRepository.findAllByUser(user.get());
-        return new ApiResponse(true, "Get items", cartItems.stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList())) ;
+
+        List<CartDTO> cartDTOList = new ArrayList<>();
+        for (Cart cart : cartItems) {
+            String productName = cart.getProductname();
+            Optional<Product> productOptional = productService.findProductByName(productName);
+            ProductDTO productDTO = productOptional.map(p ->
+                            new ProductDTO(p.getName(), p.getPrice(), p.getCategory(), p.getBrand()))
+                    .orElse(null);
+
+            CartDTO cartDTO = new CartDTO(cart.getUser().getUsername(), productName, cart.getQuantity(), productDTO);
+            cartDTOList.add(cartDTO);
+        }
+
+        return new ApiResponse(true, "Get items", cartDTOList) ;
     }
 
     public ApiResponse removeItemFromCart(String username, String productname) {

@@ -9,8 +9,8 @@ public class CartDTO {
     private String productname;
     private Integer quantity;
 
+    private ProductDTO productDTO;
     // Constructors, Getters, Setters
-
 
     public CartDTO() {
     }
@@ -19,6 +19,13 @@ public class CartDTO {
         this.username = username;
         this.productname = productname;
         this.quantity = quantity;
+    }
+
+    public CartDTO(String username, String productname, Integer quantity, ProductDTO productDTO) {
+        this.username = username;
+        this.productname = productname;
+        this.quantity = quantity;
+        this.productDTO = productDTO;
     }
 
     public String getUsername() {
@@ -43,6 +50,14 @@ public class CartDTO {
 
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
+    }
+
+    public ProductDTO getProductDTO() {
+        return productDTO;
+    }
+
+    public void setProductDTO(ProductDTO productDTO) {
+        this.productDTO = productDTO;
     }
 }
 
