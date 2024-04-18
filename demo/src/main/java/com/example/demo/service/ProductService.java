@@ -113,10 +113,6 @@ public class ProductService {
     public ApiResponse deleteProduct(String name) {
         String dbIdentifier = name.hashCode() % 2 == 0 ? "master_1" : "master_2";
         boolean deleted = productDbService.deleteProductByName(name, dbIdentifier);
-
-        // Delete all cart items with the specified product name
-        cartRepository.deleteAllByProductname(name);
-
         if (deleted) {
             return new ApiResponse(true, "Product deleted successfully.");
         } else {

@@ -148,7 +148,11 @@ public class CartService {
         cartRepository.deleteAllByUser(user.get());
         return new ApiResponse(true, "Cart cleared successfully.");
     }
-
+    @Transactional
+    public ApiResponse deleteCartByProductName(String productname) {
+        cartRepository.deleteAllByProductname(productname);
+        return new ApiResponse(true, "Cart cleared successfully.");
+    }
 
     private CartDTO convertToDTO(Cart cart) {
         return new CartDTO(
